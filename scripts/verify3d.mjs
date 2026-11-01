@@ -1,6 +1,6 @@
 /**
  * 3D 交互修复验证脚本（临时）
- * 覆盖：原子模型滚轮缩放 / 缩放上下限、立方体导航顺序、边界禁用、回到中心
+ * 覆盖：原子模型滚轮缩放 / 缩放上下限、立方体导航顺序、边界禁用、点击元素聚焦、点击空白回到中心
  * 用法：先用远程调试模式启动 Edge（9222），再 node scripts/verify3d.mjs
  */
 const list = await (await fetch('http://127.0.0.1:9222/json')).json()
@@ -140,12 +140,38 @@ const navState = () => ev(`
 `)
 console.log('初始导航:', await navState())
 const host = await ev(`const r=document.querySelector('.canvas-host').getBoundingClientRect(); return {x:r.x,y:r.y,w:r.width,h:r.height}`)
+const camState = () => ev(`
+  const d = window.__EC_CUBE_DBG__; if(!d) return null;
+  const c = d.camera(); const ct = d.controls();
+  return {
+    cam: [+c.position.x.toFixed(2), +c.position.y.toFixed(2), +c.position.z.toFixed(2)],
+    target: [+ct.target.x.toFixed(2), +ct.target.y.toFixed(2), +ct.target.z.toFixed(2)],
+    dist: +(c.position.distanceTo(ct.target)).toFixed(2),
+  }
+`)
+const before = await camState()
 await rc(Math.round(host.x + host.w * 0.5), Math.round(host.y + host.h * 0.55))
 await sleep(700)
 const sym = () => ev(`return document.querySelector('.cube-card .card-sym')?.textContent ?? '无卡片'`)
 const num = () => ev(`return document.querySelector('.cube-card .card-num')?.textContent ?? '无卡片'`)
 console.log('点击方块 → 卡片:', await sym(), await num())
 check('点击立方体弹出详情卡', (await sym()) !== '无卡片')
+// 点击方块后相机应平滑聚焦到该元素（轨道中心从表心移开）
+await sleep(1800)
+const afterFocus = await camState()
+const moved = before && afterFocus
+  ? Math.hypot(afterFocus.target[0] - before.target[0], afterFocus.target[2] - before.target[2])
+  : 0
+check(
+  '点击立方体后视角聚焦到该元素',
+  moved > 0.5,
+  `target ${JSON.stringify(before?.target)} → ${JSON.stringify(afterFocus?.target)}`,
+)
+check(
+  '聚焦后相机拉到元素近景（距离明显变小）',
+  before && afterFocus && afterFocus.dist < before.dist - 3,
+  `dist ${before?.dist} → ${afterFocus?.dist}`,
+)
 
 // 真实鼠标点击卡片内的「下一个」三次
 const seq = [await num()]
@@ -196,29 +222,33 @@ console.log('跳到 118 号后:', await sym(), await navState())
 check('118 号时「下一个」禁用', (await navState()).includes('下一个→(禁用)'))
 check('118 号卡片为 Og', (await sym()) === 'Og')
 
-/* ================= 4. 回到中心 ================= */
-console.log('\n===== 回到中心 =====')
-const camInfo = () => ev(`
-  const r = window.__EC_CUBE__; if(!r) return null;
-  return null
-`)
+/* ================= 4. 点击空白回到中心 ================= */
+console.log('\n===== 点击空白回到中心 =====')
 const cubeDbg = await ev(`
   const d = window.__EC_CUBE_DBG__; return d ? { ok:true } : { ok:false }
 `)
 console.log('立方调试钩子:', JSON.stringify(cubeDbg))
-await clickSel('.nav-bar .step', 2) // ⌖ 回到中心
-await sleep(1600)
-const home = await ev(`
-  const d = window.__EC_CUBE_DBG__; if(!d) return null;
-  const c = d.camera(); const ct = d.controls();
-  return {
-    cam: [+c.position.x.toFixed(2), +c.position.y.toFixed(2), +c.position.z.toFixed(2)],
-    target: [+ct.target.x.toFixed(2), +ct.target.y.toFixed(2), +ct.target.z.toFixed(2)],
+console.log('复位前机位（已聚焦 118 号）:', JSON.stringify(await camState()))
+// 原「⌖ 回到中心」按钮已移除，改为点击画布空白处触发
+let home = null
+for (const [fx, fy] of [
+  [0.5, 0.05],
+  [0.12, 0.12],
+  [0.85, 0.08],
+  [0.2, 0.3],
+]) {
+  await rc(Math.round(host.x + host.w * fx), Math.round(host.y + host.h * fy))
+  await sleep(1800)
+  const cur = await camState()
+  if (cur && Math.abs(cur.target[0]) < 0.1 && Math.abs(cur.target[2]) < 0.1) {
+    console.log(`空白命中点：${fx} / ${fy}`)
+    home = cur
+    break
   }
-`)
+}
 console.log('复位后机位:', JSON.stringify(home))
 check(
-  '「⌖ 回到中心」把目标点复位到周期表中心',
+  '点击空白处把目标点复位到周期表中心',
   home != null && Math.abs(home.target[0]) < 0.1 && Math.abs(home.target[2]) < 0.1,
   JSON.stringify(home?.target),
 )
@@ -231,6 +261,7 @@ check(
   home != null && Math.abs(home.cam[1] - 13) < 0.4 && Math.abs(homeDist - 21.04) < 0.6,
   `y=${home?.cam[1]} 半径=${homeDist.toFixed(2)}（基准 21.04）`,
 )
+check('点击空白处同时收起详情卡', (await sym()) === '无卡片', await sym())
 
 /* ================= 5. 其它交互回归 ================= */
 console.log('\n===== 其它交互回归 =====')
@@ -259,17 +290,33 @@ await send('Input.dispatchMouseEvent', { type: 'mouseReleased', x: Math.round(h2
 await sleep(800)
 const a1 = await azim()
 check('拖拽可旋转视角', a0 != null && a1 != null && Math.abs(a1 - a0) > 0.05, `${a0} → ${a1}`)
-// 点击卡片非按钮区域不应关闭卡片
+// 点击卡片非按钮区域不应关闭卡片（先重开一张卡片，上一节点空白已把它收起）
+await ev(`const i=document.querySelector('.jump input'); i.value='Fe'; i.dispatchEvent(new Event('input',{bubbles:true})); document.querySelector('.jump button').click(); return 1`)
+await sleep(1500)
 const cardBox = await ev(`const c=document.querySelector('.cube-card'); if(!c) return null; const r=c.getBoundingClientRect(); return {x:r.x,y:r.y,w:r.width,h:r.height}`)
 if (cardBox) {
   await rc(Math.round(cardBox.x + cardBox.w / 2), Math.round(cardBox.y + cardBox.h - 30))
   await sleep(500)
   check('点击卡片内容区不会误关卡片', (await sym()) !== '无卡片')
 }
-// 点击空白处仍应关闭卡片
-await rc(Math.round(h2.x + 14), Math.round(h2.y + h2.h - 14))
-await sleep(500)
-check('点击空白处关闭卡片（原有行为保留）', (await sym()) === '无卡片')
+// 点击空白处仍应关闭卡片（聚焦后画面被方块占满，需挑一个真正没命中方块的点）
+let closedByEmpty = false
+for (const [fx, fy] of [
+  [0.5, 0.05],
+  [0.12, 0.12],
+  [0.85, 0.08],
+  [0.2, 0.3],
+]) {
+  const h3 = await ev(`const r=document.querySelector('.canvas-host').getBoundingClientRect(); return {x:r.x,y:r.y,w:r.width,h:r.height}`)
+  await rc(Math.round(h3.x + h3.w * fx), Math.round(h3.y + h3.h * fy))
+  await sleep(900)
+  if ((await sym()) === '无卡片') {
+    console.log(`空白命中点：${fx} / ${fy}`)
+    closedByEmpty = true
+    break
+  }
+}
+check('点击空白处关闭卡片（原有行为保留）', closedByEmpty, await sym())
 // 窗口缩放
 await send('Emulation.setDeviceMetricsOverride', { width: 1024, height: 768, deviceScaleFactor: 1, mobile: false })
 await sleep(1200)

@@ -315,11 +315,19 @@ check(
   (await evaluate(`return document.querySelectorAll('.cube-legend .lg').length`)) === 10,
 )
 check(
-  '3D 视图提供视图控制（标注 / 俯视 / 重置）',
+  '3D 视图控制仅保留标注 / 俯视（复位按钮已移除）',
   await evaluate(`
     const t = Array.from(document.querySelectorAll('.cube-toolbar .mini')).map(b => b.textContent.trim());
-    return t.some(x => x.includes('标注')) && t.some(x => x.includes('俯视')) && t.some(x => x.includes('重置'));
+    const all = Array.from(document.querySelectorAll('.cube-toolbar .mini, .nav-bar .mini')).map(b => b.textContent.trim());
+    return t.some(x => x.includes('标注')) && t.some(x => x.includes('俯视'))
+      && !all.some(x => x.includes('重置') || x.includes('回到中心'));
   `),
+)
+check(
+  '操作提示说明点击空白即可回到中心',
+  (
+    await evaluate(`return document.querySelector('.canvas-host .hint')?.textContent ?? ''`)
+  ).includes('点击空白处回到中心'),
 )
 
 // 跳转导航：符号 / 中文名 / 序数

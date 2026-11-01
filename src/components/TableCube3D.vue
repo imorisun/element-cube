@@ -496,22 +496,29 @@ function onPointerDown(ev: PointerEvent) {
   dragging = true
 }
 
+/**
+ * 点击落点决定相机去向：
+ *  - 命中立方体 → 平滑聚焦到该元素，卡片跟着弹出
+ *  - 未命中任何东西（空白区域）→ 收起卡片，同时把相机拉回周期表中心视角
+ * 原先「⌖ 回到中心 / ⤾ 重置视角」两个按钮的职责，已由后者统一承担。
+ */
 function onPointerUp(ev: PointerEvent) {
   dragging = false
   if (!fromCanvas(ev)) return
   if (Math.hypot(ev.clientX - downPos.x, ev.clientY - downPos.y) > 6) return
   const el = pickAt(ev)
   if (!el) {
-    // 点空白处收起卡片（与原子模型的行为保持一致）
     if (picked.value) {
       picked.value = null
       stylesDirty = true
     }
+    resetView()
     return
   }
-  // 再次点击同一元素则收起卡片
+  // 再次点击同一元素则收起卡片（相机仍停在该元素上）
   picked.value = picked.value?.number === el.number ? null : el
   stylesDirty = true
+  focusElement(el.number)
 }
 
 /* ================= 导航 ================= */
@@ -603,7 +610,7 @@ function flyTo(target: THREE.Vector3, cam: THREE.Vector3) {
 /**
  * 复位到周期表中心。
  * 逐个切换元素会把轨道中心移到元素身上，这里把 target 与相机一起拉回基准机位，
- * 保证任何时候都能回到「整张表居中」的视角。
+ * 保证任何时候都能回到「整张表居中」的视角 —— 由点击空白区域触发。
  */
 function resetView() {
   flyTo(HOME_TARGET.clone(), HOME_CAM.clone())
@@ -819,7 +826,6 @@ watch(
         {{ labelsOn ? '🏷 标注已开' : '🏷 标注已关' }}
       </button>
       <button class="mini" @click="topView">▣ 俯视</button>
-      <button class="mini" @click="resetView">⤾ 重置视角</button>
     </div>
 
     <div class="nav-bar">
@@ -850,7 +856,6 @@ watch(
       >
         下一个 →
       </button>
-      <button class="mini step" title="相机回到周期表中心" @click="resetView">⌖ 回到中心</button>
     </div>
     <p v-if="jumpError" class="jump-error">{{ jumpError }}</p>
 
@@ -866,8 +871,9 @@ watch(
       <div v-else-if="building" class="fallback">正在构建 3D 周期表…</div>
 
       <div class="hint">
-        拖拽旋转 · 滚轮 / 双指缩放 · 右键平移 · 点击方块查看元素详情 · 切换后可用「⌖
-        回到中心」复位{{ filterActive ? ` · 当前筛选命中 ${hit.size} 种` : '' }}
+        拖拽旋转 · 滚轮 / 双指缩放 · 右键平移 · 点击方块聚焦到该元素并查看详情 · 点击空白处回到中心视角{{
+          filterActive ? ` · 当前筛选命中 ${hit.size} 种` : ''
+        }}
       </div>
 
       <div

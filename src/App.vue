@@ -32,7 +32,7 @@ const activeCats = ref<Set<CategoryKey>>(new Set())
 const selected = ref<number | null>(null)
 const hovered = ref<number | null>(null)
 const mode = ref<Mode>('grid')
-const theme = ref<'light' | 'dark'>('dark')
+const theme = ref<'light' | 'dark'>('light')
 const searchInput = ref<HTMLInputElement | null>(null)
 
 const { hit, hitCount, filterActive } = useElementFilter(query, activeCats)
@@ -111,8 +111,8 @@ function onKey(e: KeyboardEvent) {
 }
 
 onMounted(() => {
-  // 默认暗色；仅在用户此前手动切换过时才沿用记忆值，不跟随系统配色
-  theme.value = readStoredTheme() ?? 'dark'
+  // 默认浅色；仅在用户此前手动切换过时才沿用记忆值，不跟随系统配色
+  theme.value = readStoredTheme() ?? 'light'
   applyTheme()
 
   mode.value = window.innerWidth < 900 ? 'list' : 'grid'

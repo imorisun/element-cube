@@ -4,6 +4,11 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { massNumber, type ElementInfo } from '../data/elements'
 import {
+  NUCLEON_CAP,
+  nucleonLayout,
+  nucleonRadius,
+} from '../three/nucleus'
+import {
   PerfGuard,
   createRenderer,
   detectWebGL,
@@ -70,6 +75,8 @@ let lastFrame = 0
 let modelRadius = 6
 /** 原子核半径，用于推导「不能穿进核里」的缩放下限 */
 let nucleusRadius = 0.4
+/** 最近一次建模的核子统计，调试脚本用 */
+const nucleusInfo = { A: 0, drawn: 0, nucleon: 0, radius: 0 }
 let desiredDistance = 14
 let userZoom = 1
 /** 缩放上下限：下限保证不穿进原子核，上限保证模型不会缩成一粒 */
@@ -85,6 +92,8 @@ let zoomMax = 60
 let distanceAnim: number | null = null
 
 const tmpMatrix = new THREE.Object3D()
+/** 电子专用：核子实例会写 scale，混用会把电子也放大成核子大小 */
+const tmpElectron = new THREE.Object3D()
 const raycaster = new THREE.Raycaster()
 const pointerNdc = new THREE.Vector2()
 let pointerInside = false
@@ -100,9 +109,10 @@ const pickCard = computed(() => {
   if (p.kind === 'nucleus') {
     const A = Math.max(1, massNumber(el))
     const N = Math.max(0, A - el.number)
+    const drawn = Math.min(A, NUCLEON_CAP)
     return {
       title: '原子核',
-      sub: `${el.symbol} · 由 ${A} 个核子组成`,
+      sub: `${el.symbol} · 由 ${A} 个核子组成${drawn < A ? `（示意绘制 ${drawn} 个）` : ''}`,
       rows: [
         ['质子数 Z', String(el.number)],
         ['中子数 N', String(N)],
@@ -158,9 +168,22 @@ function buildModel() {
   const Z = el.number
   const N = Math.max(0, A - Z)
 
-  /* ---- 原子核 ---- */
-  nucleusRadius = 0.17 * Math.cbrt(A) * 1.55 + 0.12
-  const nucleonGeo = new THREE.SphereGeometry(0.155, 12, 10)
+  /* ---- 原子核 ----
+   * 排布（间距 / 半径 / 居中）全部由 nucleus.ts 决定：
+   * 先在单位空间里 packing 出不重叠且紧凑的一簇，再按「随核子数平滑收敛」的
+   * 核子半径整体缩放 —— 从 1 个核子到 300 个核子都不会松散或偏心。 */
+  const layout = nucleonLayout(A)
+  const drawCount = layout.count
+  const nucleonR = nucleonRadius(drawCount)
+  nucleusRadius = layout.bound * nucleonR
+  nucleusInfo.A = A
+  nucleusInfo.drawn = drawCount
+  nucleusInfo.nucleon = nucleonR
+  nucleusInfo.radius = nucleusRadius
+
+  // 核子少时球面细分高一些（单个质子的轮廓要圆润），核子多时降面数省开销
+  const seg = drawCount <= 12 ? 20 : drawCount <= 48 ? 14 : 10
+  const nucleonGeo = new THREE.SphereGeometry(1, seg, Math.max(6, Math.round(seg * 0.7)))
 
   const protonMat = new THREE.MeshStandardMaterial({
     color: '#ff5b6e',
@@ -175,29 +198,28 @@ function buildModel() {
     metalness: 0.05,
   })
 
-  const total = Z + N
-  const drawCount = Math.min(total, 320)
-  const protons = new THREE.InstancedMesh(nucleonGeo, protonMat, Math.max(1, drawCount))
-  const neutrons = new THREE.InstancedMesh(nucleonGeo, neutronMat, Math.max(1, drawCount))
+  // 实际绘制的质子 / 中子数（按真实比例分摊到 drawCount 个核子上）
+  const zDrawn = THREE.MathUtils.clamp(Math.round((drawCount * Z) / A), 0, drawCount)
+  const nDrawn = drawCount - zDrawn
+  const protons = new THREE.InstancedMesh(nucleonGeo, protonMat, Math.max(1, zDrawn))
+  const neutrons = new THREE.InstancedMesh(nucleonGeo, neutronMat, Math.max(1, nDrawn))
   protons.count = 0
   neutrons.count = 0
 
-  // 斐波那契球均匀分布；质子与中子按 Bresenham 交错排列，
-  // 避免「质子全在一极、中子全在另一极」的错误观感
-  const golden = Math.PI * (3 - Math.sqrt(5))
+  // 单位空间坐标 × 核子半径 = 实际坐标，实例缩放同样是核子半径
+  // （等比缩放不会破坏 packing 保证的最小间距，因此核子恒不重叠）
+  tmpMatrix.scale.setScalar(nucleonR)
   for (let i = 0; i < drawCount; i++) {
-    const y = 1 - (i / Math.max(1, drawCount - 1)) * 2
-    const r = Math.sqrt(Math.max(0, 1 - y * y))
-    const theta = golden * i
-    const jitter = 0.9 + ((i * 37) % 11) / 55
-    const rad = nucleusRadius * 0.82 * jitter
-    tmpMatrix.position.set(Math.cos(theta) * r * rad, y * rad, Math.sin(theta) * r * rad)
-    tmpMatrix.rotation.set(theta, y * Math.PI, 0)
+    tmpMatrix.position.set(
+      layout.positions[i * 3] * nucleonR,
+      layout.positions[i * 3 + 1] * nucleonR,
+      layout.positions[i * 3 + 2] * nucleonR,
+    )
     tmpMatrix.updateMatrix()
 
-    // 累计取整：恰好取到 Z 个质子，且沿螺旋均匀交错，不会出现质子/中子分居两极
-    const isProton =
-      Math.floor(((i + 1) * Z) / drawCount) > Math.floor((i * Z) / drawCount)
+    // 累计取整：恰好取到 zDrawn 个质子，且沿簇内顺序均匀交错，
+    // 不会出现「质子全在内核、中子全在外壳」的错误观感
+    const isProton = Math.floor(((i + 1) * zDrawn) / drawCount) > Math.floor((i * zDrawn) / drawCount)
     if (isProton) protons.setMatrixAt(protons.count++, tmpMatrix.matrix)
     else neutrons.setMatrixAt(neutrons.count++, tmpMatrix.matrix)
   }
@@ -206,7 +228,7 @@ function buildModel() {
   root.add(protons, neutrons)
 
   const glow = new THREE.Mesh(
-    new THREE.SphereGeometry(nucleusRadius * 2.05, 20, 16),
+    new THREE.SphereGeometry(nucleusRadius * 1.85, 20, 16),
     new THREE.MeshBasicMaterial({
       color: accent,
       transparent: true,
@@ -218,9 +240,10 @@ function buildModel() {
   root.add(glow)
   nucleusGlow = glow
 
-  // 核的拾取代理：包住整个核（含核子间隙），保证任意角度都能点中
+  // 核的拾取代理：包住整个核（含核子间隙），保证任意角度都能点中。
+  // 给一个下限，避免氢这种「只有一个质子」的核热区太小点不中
   const nucleusProxy = new THREE.Mesh(
-    new THREE.SphereGeometry(nucleusRadius * 1.08, 16, 12),
+    new THREE.SphereGeometry(Math.max(nucleusRadius * 1.1, 0.22), 16, 12),
     new THREE.MeshBasicMaterial({ visible: false }),
   )
   nucleusProxy.userData.pick = 'nucleus'
@@ -238,16 +261,18 @@ function buildModel() {
     },
     { cache: false },
   )
-  nLabel.position.set(0, nucleusRadius * 1.5 + 0.22, 0)
+  // 标注贴在核的正上方，与核表面保持固定距离（核再大也不会压到核上）
+  nLabel.position.set(0, nucleusRadius + 0.34, 0)
   nLabel.visible = labelsOn.value
   root.add(nLabel)
   nucleusLabel = nLabel
 
   /* ---- 电子层 ---- */
   const shells = el.shells
-  const FIRST_GAP = 0.95
-  const OUTER = 5.0
-  const step = shells.length > 1 ? (OUTER - FIRST_GAP) / (shells.length - 1) : 0
+  // 核表面到 K 层的间隙随核增大而略微增大：小核不会显得空荡荡，大核也不会贴脸
+  const FIRST_GAP = 0.62 + 0.3 * nucleusRadius
+  const SPAN = 4.6
+  const step = shells.length > 1 ? SPAN / (shells.length - 1) : 0
   // 共享电子几何体 / 材质，118 个电子只有一份 GPU 资源
   const electronGeo = new THREE.SphereGeometry(0.085, 10, 8)
   const electronMat = new THREE.MeshStandardMaterial({
@@ -434,12 +459,13 @@ function tick() {
 
   simTime += dt
 
+  tmpElectron.scale.setScalar(1)
   for (const shell of shellRecs) {
     for (let i = 0; i < shell.count; i++) {
       const a = simTime * shell.speed + (i / shell.count) * Math.PI * 2
-      tmpMatrix.position.set(Math.cos(a) * shell.radius, Math.sin(a) * shell.radius, 0)
-      tmpMatrix.updateMatrix()
-      shell.electrons.setMatrixAt(i, tmpMatrix.matrix)
+      tmpElectron.position.set(Math.cos(a) * shell.radius, Math.sin(a) * shell.radius, 0)
+      tmpElectron.updateMatrix()
+      shell.electrons.setMatrixAt(i, tmpElectron.matrix)
     }
     shell.electrons.instanceMatrix.needsUpdate = true
   }
@@ -632,6 +658,12 @@ function boot() {
       camera: () => camera,
       controls: () => controls,
       limits: () => ({ min: zoomMin, max: zoomMax, fit: fitDistance(), radius: modelRadius }),
+      nucleus: () => ({
+        A: nucleusInfo.A,
+        drawn: nucleusInfo.drawn,
+        nucleon: nucleusInfo.nucleon,
+        radius: nucleusInfo.radius,
+      }),
     })
     ready.value = true
     tick()

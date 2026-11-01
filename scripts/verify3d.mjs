@@ -43,7 +43,7 @@ ws.addEventListener('message', (e) => {
     consoleErrors.push('EXC: ' + JSON.stringify(d.params.exceptionDetails?.text ?? '').slice(0, 200))
   }
 })
-await send('Page.navigate', { url: 'http://127.0.0.1:5173/element-cube/' })
+await send('Page.navigate', { url: process.env.EC_URL ?? 'http://127.0.0.1:5173/element-cube/' })
 await sleep(3000)
 async function ev(expr) {
   const r = await send('Runtime.evaluate', { expression: `(function(){ ${expr} })()`, returnByValue: true })

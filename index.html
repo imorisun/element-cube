@@ -1,14 +1,42 @@
 <!doctype html>
-<html lang="zh-CN" data-theme="light">
+<html lang="zh-CN" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <script>
+      // 默认暗色；若用户此前手动切换过则以记忆值为准。
+      // 必须在样式生效前执行，否则会出现「先白后暗」的闪烁。
+      try {
+        var t = localStorage.getItem('ec-theme')
+        document.documentElement.dataset.theme =
+          t === 'light' || t === 'dark' ? t : 'dark'
+      } catch (e) {
+        document.documentElement.dataset.theme = 'dark'
+      }
+    </script>
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="/favicon.svg"
+      media="(prefers-color-scheme: light)"
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon-dark.svg" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#eef2f9" />
+    <meta name="theme-color" content="#070b16" />
     <meta
       name="description"
       content="元素立方 —— 交互式元素周期表，收录 118 种元素的详细资料，支持搜索、分类筛选、3D 原子模型与 3D 立方周期表。"
     />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="元素立方 · 交互式元素周期表" />
+    <meta
+      property="og:description"
+      content="118 种元素的详细资料、3D 原子模型与 3D 立方周期表，支持搜索与分类筛选。"
+    />
+    <meta property="og:image" content="/element-cube/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
     <title>元素立方 · 交互式元素周期表</title>
   </head>
   <body>

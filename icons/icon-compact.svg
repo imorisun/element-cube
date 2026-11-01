@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-labelledby="t d">
+  <title id="t">元素立方（小尺寸）</title>
+  <desc id="d">面向 16–32px 的精简版本：保留立方体三面与顶面的高亮元素格，移除网格线与原子细节。</desc>
+
+  <g shape-rendering="geometricPrecision">
+    <path d="M16 5 L26.5 11 L16 17 L5.5 11 Z" fill="#7CA0FF"/>
+    <path d="M16 17 L26.5 11 L26.5 19.5 L16 25.5 Z" fill="#3F6BF5"/>
+    <path d="M5.5 11 L16 17 L16 25.5 L5.5 19.5 Z" fill="#2C47C4"/>
+    <path d="M21.25 8 L26.5 11 L21.25 14 L16 11 Z" fill="#38D9A9"/>
+  </g>
+</svg>

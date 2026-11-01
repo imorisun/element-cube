@@ -52,7 +52,8 @@
 
 ### 体验细节
 
-- 浅色 / 深色主题切换（跟随系统，记忆偏好）
+- **默认暗色主题**，可一键切换浅色；选择记忆到 localStorage，首帧前应用（无闪烁）
+  - 恢复「跟随系统」：把 `src/App.vue` 中 `theme.value = readStoredTheme() ?? 'dark'` 改回 `matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'` 即可
 - 桌面端与移动端响应式（移动端详情为底部抽屉）
 - 快捷键：`/` 聚焦搜索框，`←` `→` 切换相邻元素，`Esc` 关闭面板
 - 尊重系统「减少动态效果」偏好；WebGL 不可用时优雅降级，上下文丢失可一键重渲染
@@ -75,6 +76,15 @@ pnpm dev        # 启动开发服务器
 pnpm build      # 生产构建（含类型检查）
 pnpm preview    # 预览构建产物
 ```
+
+## 图标与品牌
+
+项目内置一套完整的图标系统（`icons/`），详情见 [icons/README.md](icons/README.md)：
+
+- **主图标**：等距立方体——顶面是周期表格栅、右面是原子模型轨道、左面承担体积感
+- **变体**：完整版 / 小尺寸精简版 / 深色优化版 / 单色 `currentColor` 线框版 / App 图标（含 maskable）
+- **产出**：favicon（SVG 深浅自动切换 + ICO 兜底）、apple-touch-icon、PWA manifest、1200×630 OG 分享卡片
+- 重新导出 PNG：`node scripts/gen-icons.mjs`（需远程调试浏览器，见脚本头部注释）
 
 ## 部署到子路径 `/element-cube/`
 

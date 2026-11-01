@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-labelledby="t d">
+  <title id="t">元素立方 · 自适应应用图标</title>
+  <desc id="d">Android maskable 版本：满幅背景，主体收缩至中心安全区内，避免被系统遮罩裁切。</desc>
+
+  <defs>
+    <linearGradient id="bgm" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4F7CFF"/>
+      <stop offset="0.55" stop-color="#3659E8"/>
+      <stop offset="1" stop-color="#2B3FBF"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="512" height="512" fill="url(#bgm)"/>
+
+  <g transform="translate(80.6 94.3) scale(10.96)" shape-rendering="geometricPrecision">
+    <path d="M16 5 L26.5 11 L16 17 L5.5 11 Z" fill="#9DBBFF"/>
+    <path d="M16 17 L26.5 11 L26.5 19.5 L16 25.5 Z" fill="#5C84FF"/>
+    <path d="M5.5 11 L16 17 L16 25.5 L5.5 19.5 Z" fill="#3657DA"/>
+
+    <path d="M10.75 8 L21.25 14" fill="none" stroke="#FFFFFF" stroke-opacity="0.5" stroke-width="0.75"/>
+    <path d="M21.25 8 L10.75 14" fill="none" stroke="#FFFFFF" stroke-opacity="0.5" stroke-width="0.75"/>
+
+    <path d="M21.25 8 L26.5 11 L21.25 14 L16 11 Z" fill="#3FE3B4"/>
+
+    <circle cx="0" cy="0" r="3.1" fill="none" stroke="#FFFFFF" stroke-opacity="0.42" stroke-width="0.9" transform="matrix(0.86824 -0.49614 0 1 21.25 18.25)"/>
+    <circle cx="0" cy="0" r="1.15" fill="#3FE3B4" transform="matrix(0.86824 -0.49614 0 1 21.25 18.25)"/>
+    <circle cx="18.72" cy="18.64" r="0.95" fill="#FFFFFF"/>
+  </g>
+</svg>

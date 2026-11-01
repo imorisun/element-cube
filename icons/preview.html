@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>元素立方 · 图标规范</title>
+    <style>
+      :root {
+        --bg: #f6f8fc;
+        --surface: #ffffff;
+        --border: rgba(15, 23, 42, 0.1);
+        --text: #0d1526;
+        --dim: #5a6b85;
+        --accent: #3f6bf5;
+        --mint: #38d9a9;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        padding: 40px 32px 64px;
+        background: var(--bg);
+        color: var(--text);
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+          'Microsoft YaHei', sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+      .wrap {
+        max-width: 1000px;
+        margin: 0 auto;
+      }
+      h1 {
+        font-size: 22px;
+        font-weight: 600;
+        margin: 0 0 6px;
+      }
+      .sub {
+        color: var(--dim);
+        font-size: 14px;
+        margin: 0 0 36px;
+      }
+      section {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 24px 26px;
+        margin-bottom: 20px;
+      }
+      h2 {
+        font-size: 14px;
+        font-weight: 600;
+        margin: 0 0 18px;
+        letter-spacing: 0.02em;
+      }
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        gap: 28px;
+      }
+      .cell {
+        text-align: center;
+      }
+      .slot {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+      }
+      .cap {
+        margin-top: 8px;
+        font-size: 11px;
+        color: var(--dim);
+        font-variant-numeric: tabular-nums;
+      }
+      .swatches {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .sw {
+        width: 108px;
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+      }
+      .sw i {
+        display: block;
+        height: 46px;
+      }
+      .sw span {
+        display: block;
+        padding: 7px 8px;
+        font-size: 11px;
+        color: var(--dim);
+        font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+      }
+      .ctx {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .navbar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 16px;
+        border-radius: 10px;
+        background: var(--bg);
+        border: 1px solid var(--border);
+      }
+      .navbar b {
+        font-size: 15px;
+        font-weight: 600;
+      }
+      .navbar nav {
+        display: flex;
+        gap: 14px;
+        margin-left: 12px;
+        font-size: 13px;
+        color: var(--dim);
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 15px;
+        border-radius: 9px;
+        border: 1px solid var(--border);
+        background: var(--surface);
+        font-size: 13px;
+        color: var(--text);
+      }
+      .btn.solid {
+        background: var(--accent);
+        border-color: transparent;
+        color: #fff;
+      }
+      .darkbox {
+        background: #12192b;
+        border-radius: 14px;
+        padding: 22px;
+        display: flex;
+        gap: 26px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .darkbox .cap {
+        color: #8fa0bd;
+      }
+      .note {
+        font-size: 12.5px;
+        color: var(--dim);
+        line-height: 1.7;
+        margin: 14px 0 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>元素立方 · 图标规范</h1>
+      <p class="sub">Element Cube — Visual Identity / Icon System</p>
+
+      <section>
+        <h2>尺寸测试（主图标）</h2>
+        <div class="row">
+          <div class="cell">
+            <div class="slot" style="width: 132px; height: 132px">
+              <img src="icon.svg" width="120" height="120" alt="" />
+            </div>
+            <div class="cap">120 px</div>
+          </div>
+          <div class="cell">
+            <div class="slot" style="width: 76px; height: 76px">
+              <img src="icon.svg" width="64" height="64" alt="" />
+            </div>
+            <div class="cap">64 px</div>
+          </div>
+          <div class="cell">
+            <div class="slot" style="width: 60px; height: 60px">
+              <img src="icon.svg" width="48" height="48" alt="" />
+            </div>
+            <div class="cap">48 px</div>
+          </div>
+          <div class="cell">
+            <div class="slot" style="width: 44px; height: 44px">
+              <img src="icon.svg" width="32" height="32" alt="" />
+            </div>
+            <div class="cap">32 px</div>
+          </div>
+          <div class="cell">
+            <div class="slot" style="width: 36px; height: 36px">
+              <img src="icon-compact.svg" width="24" height="24" alt="" />
+            </div>
+            <div class="cap">24 px · 精简版</div>
+          </div>
+          <div class="cell">
+            <div class="slot" style="width: 28px; height: 28px">
+              <img src="icon-compact.svg" width="16" height="16" alt="" />
+            </div>
+            <div class="cap">16 px · 精简版</div>
+          </div>
+        </div>
+        <p class="note">
+          32 px 及以上使用完整版（含顶面格栅与右面原子模型）；24 px 及以下切换到精简版，保留立方体三面与高亮元素格。
+        </p>
+      </section>
+
+      <section>
+        <h2>应用图标</h2>
+        <div class="row">
+          <div class="cell">
+            <img src="icon-app.svg" width="112" height="112" alt="" style="border-radius: 24px" />
+            <div class="cap">标准版 512</div>
+          </div>
+          <div class="cell">
+            <img src="icon-app-maskable.svg" width="112" height="112" alt="" style="border-radius: 24px" />
+            <div class="cap">Maskable 512</div>
+          </div>
+          <div class="cell">
+            <div style="background: #12192b; padding: 14px; border-radius: 22px">
+              <img src="icon-app.svg" width="84" height="84" alt="" style="border-radius: 18px" />
+            </div>
+            <div class="cap">深色桌面</div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>变体</h2>
+        <div class="row">
+          <div class="cell">
+            <div class="slot" style="width: 68px; height: 68px">
+              <img src="icon.svg" width="56" height="56" alt="" />
+            </div>
+            <div class="cap">多色 · 浅色背景</div>
+          </div>
+          <div class="cell">
+            <div class="slot" style="width: 68px; height: 68px">
+              <img src="icon-dark.svg" width="56" height="56" alt="" />
+            </div>
+            <div class="cap">多色 · 深色背景</div>
+          </div>
+          <div class="cell">
+            <div class="slot" style="width: 68px; height: 68px; color: #3f6bf5">
+              <svg viewBox="0 0 32 32" width="56" height="56" role="img" aria-hidden="true">
+                <g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
+                  <path d="M16 5 L26.5 11 L26.5 19.5 L16 25.5 L5.5 19.5 L5.5 11 Z"/>
+                  <path d="M5.5 11 L16 17 L26.5 11"/>
+                  <path d="M16 17 L16 25.5"/>
+                </g>
+                <circle cx="21.25" cy="18.25" r="2" fill="currentColor"/>
+              </svg>
+            </div>
+            <div class="cap">单色 currentColor</div>
+          </div>
+          <div class="cell">
+            <div class="slot" style="width: 68px; height: 68px">
+              <img src="icon-compact.svg" width="56" height="56" alt="" />
+            </div>
+            <div class="cap">精简版</div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>品牌色</h2>
+        <div class="swatches">
+          <div class="sw"><i style="background: #7ca0ff"></i><span>顶面 #7CA0FF</span></div>
+          <div class="sw"><i style="background: #3f6bf5"></i><span>主面 #3F6BF5</span></div>
+          <div class="sw"><i style="background: #2c47c4"></i><span>暗面 #2C47C4</span></div>
+          <div class="sw"><i style="background: #38d9a9"></i><span>强调 #38D9A9</span></div>
+        </div>
+      </section>
+
+      <section>
+        <h2>使用场景</h2>
+        <div class="ctx">
+          <div class="navbar">
+            <img src="icon.svg" width="28" height="28" alt="" />
+            <b>元素立方</b>
+            <nav><span>周期表</span><span>列表</span><span>3D 立方</span></nav>
+          </div>
+          <button class="btn">
+            <svg viewBox="0 0 32 32" width="18" height="18" role="img" aria-hidden="true" style="color: #38d9a9">
+              <g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
+                <path d="M16 5 L26.5 11 L26.5 19.5 L16 25.5 L5.5 19.5 L5.5 11 Z"/>
+                <path d="M5.5 11 L16 17 L26.5 11"/>
+                <path d="M16 17 L16 25.5"/>
+              </g>
+              <circle cx="21.25" cy="18.25" r="2" fill="currentColor"/>
+            </svg>
+            切换视图
+          </button>
+          <button class="btn solid">
+            <svg viewBox="0 0 32 32" width="18" height="18" role="img" aria-hidden="true" style="color: #ffffff">
+              <g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
+                <path d="M16 5 L26.5 11 L26.5 19.5 L16 25.5 L5.5 19.5 L5.5 11 Z"/>
+                <path d="M5.5 11 L16 17 L26.5 11"/>
+                <path d="M16 17 L16 25.5"/>
+              </g>
+              <circle cx="21.25" cy="18.25" r="2" fill="currentColor"/>
+            </svg>
+            打开 3D 模型
+          </button>
+        </div>
+        <div class="darkbox" style="margin-top: 16px">
+          <div class="cell" style="text-align: left">
+            <img src="icon-dark.svg" width="44" height="44" alt="" />
+            <div class="cap">浏览器标签（深色）</div>
+          </div>
+          <div class="cell" style="text-align: left">
+            <img src="icon-app.svg" width="52" height="52" alt="" style="border-radius: 11px" />
+            <div class="cap">主屏幕图标</div>
+          </div>
+          <div class="cell" style="text-align: left; color: #e9eefb">
+            <svg viewBox="0 0 32 32" width="40" height="40" role="img" aria-hidden="true">
+              <g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
+                <path d="M16 5 L26.5 11 L26.5 19.5 L16 25.5 L5.5 19.5 L5.5 11 Z"/>
+                <path d="M5.5 11 L16 17 L26.5 11"/>
+                <path d="M16 17 L16 25.5"/>
+              </g>
+              <circle cx="21.25" cy="18.25" r="2" fill="currentColor"/>
+            </svg>
+            <div class="cap">深色导航栏</div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>

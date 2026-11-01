@@ -32,7 +32,7 @@ const activeCats = ref<Set<CategoryKey>>(new Set())
 const selected = ref<number | null>(null)
 const hovered = ref<number | null>(null)
 const mode = ref<Mode>('grid')
-const theme = ref<'light' | 'dark'>('light')
+const theme = ref<'light' | 'dark'>('dark')
 const searchInput = ref<HTMLInputElement | null>(null)
 
 const { hit, hitCount, filterActive } = useElementFilter(query, activeCats)
@@ -76,8 +76,26 @@ function randomElement() {
   selectByNumber(n)
 }
 
+/** 浏览器 UI（地址栏 / 移动端状态栏）跟随的主题色 */
+const THEME_COLOR: Record<'light' | 'dark', string> = {
+  light: '#eef2f9',
+  dark: '#070b16',
+}
+
+function readStoredTheme(): 'light' | 'dark' | null {
+  try {
+    const saved = localStorage.getItem('ec-theme')
+    return saved === 'dark' || saved === 'light' ? saved : null
+  } catch {
+    return null
+  }
+}
+
 function applyTheme() {
   document.documentElement.dataset.theme = theme.value
+  document
+    .querySelector('meta[name="theme-color"]')
+    ?.setAttribute('content', THEME_COLOR[theme.value])
 }
 
 function onKey(e: KeyboardEvent) {
@@ -93,9 +111,8 @@ function onKey(e: KeyboardEvent) {
 }
 
 onMounted(() => {
-  const saved = localStorage.getItem('ec-theme')
-  if (saved === 'dark' || saved === 'light') theme.value = saved
-  else theme.value = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+  // 默认暗色；仅在用户此前手动切换过时才沿用记忆值，不跟随系统配色
+  theme.value = readStoredTheme() ?? 'dark'
   applyTheme()
 
   mode.value = window.innerWidth < 900 ? 'list' : 'grid'
@@ -108,7 +125,11 @@ onBeforeUnmount(() => {
 
 watch(theme, (v) => {
   applyTheme()
-  localStorage.setItem('ec-theme', v)
+  try {
+    localStorage.setItem('ec-theme', v)
+  } catch {
+    /* 隐私模式下忽略 */
+  }
 })
 </script>
 

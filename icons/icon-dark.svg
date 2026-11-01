@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-labelledby="t d">
+  <title id="t">元素立方（深色模式）</title>
+  <desc id="d">等距立方体，顶面为周期表格栅，右面为原子模型，针对深色背景提亮的版本。</desc>
+
+  <g shape-rendering="geometricPrecision">
+    <path d="M16 5 L26.5 11 L16 17 L5.5 11 Z" fill="#A9C4FF"/>
+    <path d="M16 17 L26.5 11 L26.5 19.5 L16 25.5 Z" fill="#5B86FF"/>
+    <path d="M5.5 11 L16 17 L16 25.5 L5.5 19.5 Z" fill="#3352CF"/>
+
+    <path d="M10.75 8 L21.25 14" fill="none" stroke="#FFFFFF" stroke-opacity="0.55" stroke-width="0.75"/>
+    <path d="M21.25 8 L10.75 14" fill="none" stroke="#FFFFFF" stroke-opacity="0.55" stroke-width="0.75"/>
+
+    <path d="M21.25 8 L26.5 11 L21.25 14 L16 11 Z" fill="#4FE7BE"/>
+
+    <circle cx="0" cy="0" r="3.1" fill="none" stroke="#FFFFFF" stroke-opacity="0.5" stroke-width="0.9" transform="matrix(0.86824 -0.49614 0 1 21.25 18.25)"/>
+    <circle cx="0" cy="0" r="1.15" fill="#4FE7BE" transform="matrix(0.86824 -0.49614 0 1 21.25 18.25)"/>
+    <circle cx="18.72" cy="18.64" r="0.95" fill="#FFFFFF"/>
+  </g>
+</svg>

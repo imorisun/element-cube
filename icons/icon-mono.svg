@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-labelledby="t d">
+  <title id="t">元素立方（单色）</title>
+  <desc id="d">线框立方体加实心原子核，全部使用 currentColor，适用于按钮内嵌、导航栏与任意单色场景。</desc>
+
+  <g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M16 5 L26.5 11 L26.5 19.5 L16 25.5 L5.5 19.5 L5.5 11 Z"/>
+    <path d="M5.5 11 L16 17 L26.5 11"/>
+    <path d="M16 17 L16 25.5"/>
+  </g>
+  <circle cx="21.25" cy="18.25" r="2" fill="currentColor"/>
+</svg>

@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-labelledby="t d">
+  <title id="t">元素立方 · 分享卡片</title>
+  <desc id="d">社交媒体分享卡片：左侧品牌立方体图标，右侧产品名与副标题。</desc>
+
+  <defs>
+    <linearGradient id="ogbg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0B1230"/>
+      <stop offset="0.55" stop-color="#122058"/>
+      <stop offset="1" stop-color="#0B2E63"/>
+    </linearGradient>
+    <radialGradient id="glow1" cx="0.18" cy="0.2" r="0.55">
+      <stop offset="0" stop-color="#4F7CFF" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#4F7CFF" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow2" cx="0.9" cy="0.85" r="0.5">
+      <stop offset="0" stop-color="#38D9A9" stop-opacity="0.32"/>
+      <stop offset="1" stop-color="#38D9A9" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#ogbg)"/>
+  <rect width="1200" height="630" fill="url(#glow1)"/>
+  <rect width="1200" height="630" fill="url(#glow2)"/>
+
+  <g transform="translate(158 208) scale(10.6)" shape-rendering="geometricPrecision">
+    <path d="M16 5 L26.5 11 L16 17 L5.5 11 Z" fill="#9DBBFF"/>
+    <path d="M16 17 L26.5 11 L26.5 19.5 L16 25.5 Z" fill="#5C84FF"/>
+    <path d="M5.5 11 L16 17 L16 25.5 L5.5 19.5 Z" fill="#3657DA"/>
+    <path d="M10.75 8 L21.25 14" fill="none" stroke="#FFFFFF" stroke-opacity="0.5" stroke-width="0.75"/>
+    <path d="M21.25 8 L10.75 14" fill="none" stroke="#FFFFFF" stroke-opacity="0.5" stroke-width="0.75"/>
+    <path d="M21.25 8 L26.5 11 L21.25 14 L16 11 Z" fill="#3FE3B4"/>
+    <circle cx="0" cy="0" r="3.1" fill="none" stroke="#FFFFFF" stroke-opacity="0.42" stroke-width="0.9" transform="matrix(0.86824 -0.49614 0 1 21.25 18.25)"/>
+    <circle cx="0" cy="0" r="1.15" fill="#3FE3B4" transform="matrix(0.86824 -0.49614 0 1 21.25 18.25)"/>
+    <circle cx="18.72" cy="18.64" r="0.95" fill="#FFFFFF"/>
+  </g>
+
+  <g font-family="'Inter','PingFang SC','Microsoft YaHei',sans-serif">
+    <text x="470" y="290" fill="#FFFFFF" font-size="88" font-weight="700" letter-spacing="1">元素立方</text>
+    <text x="472" y="352" fill="#9DBBFF" font-size="38" font-weight="500">交互式元素周期表</text>
+    <text x="472" y="414" fill="#B7C6E8" font-size="24">118 种元素 · 3D 原子模型 · 3D 立方周期表</text>
+    <text x="472" y="458" fill="#7FA3D8" font-size="21">搜索 · 分类筛选 · 分组高亮 · 响应式</text>
+  </g>
+</svg>

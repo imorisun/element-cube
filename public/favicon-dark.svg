@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-labelledby="t d">
+  <title id="t">元素立方（小尺寸 · 深色模式）</title>
+  <desc id="d">面向 16–32px 的精简版本，针对深色背景提亮。</desc>
+
+  <g shape-rendering="geometricPrecision">
+    <path d="M16 5 L26.5 11 L16 17 L5.5 11 Z" fill="#A9C4FF"/>
+    <path d="M16 17 L26.5 11 L26.5 19.5 L16 25.5 Z" fill="#5B86FF"/>
+    <path d="M5.5 11 L16 17 L16 25.5 L5.5 19.5 Z" fill="#3352CF"/>
+    <path d="M21.25 8 L26.5 11 L21.25 14 L16 11 Z" fill="#4FE7BE"/>
+  </g>
+</svg>

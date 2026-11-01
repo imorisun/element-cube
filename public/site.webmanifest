@@ -1,0 +1,17 @@
+{
+  "name": "元素立方 · 交互式元素周期表",
+  "short_name": "元素立方",
+  "description": "收录 118 种元素的详细资料，支持搜索、分类筛选、3D 原子模型与 3D 立方周期表。",
+  "id": ".",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#eef2f9",
+  "theme_color": "#3f6bf5",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "app-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "app-icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

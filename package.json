@@ -11,7 +11,8 @@
     "shots": "node scripts/shots.mjs",
     "perf": "node scripts/perf3d.mjs",
     "verify": "node scripts/verify3d.mjs",
-    "verify:deploy": "node scripts/verify-deploy.mjs"
+    "verify:deploy": "node scripts/verify-deploy.mjs",
+    "verify:theme": "node scripts/verify-theme.mjs"
   },
   "dependencies": {
     "three": "^0.187.0",

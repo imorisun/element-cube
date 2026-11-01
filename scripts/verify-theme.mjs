@@ -2,12 +2,12 @@
  * 主题默认值验证
  *
  * 校验点：
- *  1. 首次访问（无 localStorage）默认浅色，且 <html data-theme> 在首帧前就已确定
- *  2. body 实际计算样式为浅色背景 / 深色文字
- *  3. theme-color meta 同步为浅色
- *  4. 手动切到深色后写入 localStorage，刷新仍然保留（记忆生效）
- *  5. 清除记忆后刷新重新回到浅色
- *  6. 浅色 / 深色下均无控制台报错
+ *  1. 首次访问（无 localStorage）默认暗色，且 <html data-theme> 在首帧前就已确定
+ *  2. body 实际计算样式为深色背景 / 浅色文字
+ *  3. theme-color meta 同步为深色
+ *  4. 手动切到浅色后写入 localStorage，刷新仍然保留（记忆生效）
+ *  5. 清除记忆后刷新重新回到暗色
+ *  6. 浅色 / 暗色下均无控制台报错
  *
  * 前置：远程调试模式启动浏览器并打开站点
  *   msedge.exe --headless=new --remote-debugging-port=9222 \
@@ -82,10 +82,10 @@ await send('Page.navigate', { url: APP_URL })
 await sleep(2600)
 
 const themeAttr = await ev(`return document.documentElement.dataset.theme`)
-check('默认 data-theme = light', themeAttr === 'light', `实际 ${themeAttr}`)
+check('默认 data-theme = dark', themeAttr === 'dark', `实际 ${themeAttr}`)
 
 const stored = await ev(`try { return localStorage.getItem('ec-theme') } catch (e) { return 'ERR' }`)
-check('首次访问不写入记忆（保留默认）', stored === null || stored === 'light', `实际 ${stored}`)
+check('首次访问不写入记忆（保留默认）', stored === null || stored === 'dark', `实际 ${stored}`)
 
 const bodyStyle = await ev(`
   const s = getComputedStyle(document.body);
@@ -96,13 +96,13 @@ const [br, bg_, bb] = rgb(bodyStyle.bg)
 const [fr, fg_, fb] = rgb(bodyStyle.fg)
 const bgLum = (br * 299 + bg_ * 587 + bb * 114) / 1000
 const fgLum = (fr * 299 + fg_ * 587 + fb * 114) / 1000
-check('body 背景为浅色', bgLum > 180, `bg=${bodyStyle.bg} 亮度=${bgLum.toFixed(0)}`)
-check('body 文字为深色', fgLum < 90, `fg=${bodyStyle.fg} 亮度=${fgLum.toFixed(0)}`)
+check('body 背景为深色', bgLum < 60, `bg=${bodyStyle.bg} 亮度=${bgLum.toFixed(0)}`)
+check('body 文字为亮色', fgLum > 180, `fg=${bodyStyle.fg} 亮度=${fgLum.toFixed(0)}`)
 
 const themeColor = await ev(
   `return document.querySelector('meta[name="theme-color"]')?.getAttribute('content')`,
 )
-check('theme-color 已同步为浅色 #eef2f9', themeColor === '#eef2f9', `实际 ${themeColor}`)
+check('theme-color 已同步为深色 #070b16', themeColor === '#070b16', `实际 ${themeColor}`)
 
 await ev(`
   const b = [...document.querySelectorAll('.segment button')].find(n => n.textContent.includes('周期表'));
@@ -113,57 +113,57 @@ await sleep(800)
 const fs = await import('node:fs')
 fs.mkdirSync('.screenshots', { recursive: true })
 let shot = await send('Page.captureScreenshot', { format: 'png' })
-fs.writeFileSync('.screenshots/14-default-light-grid.png', Buffer.from(shot.result.data, 'base64'))
-console.log('  📷 已保存 .screenshots/14-default-light-grid.png')
+fs.writeFileSync('.screenshots/14-default-dark-grid.png', Buffer.from(shot.result.data, 'base64'))
+console.log('  📷 已保存 .screenshots/14-default-dark-grid.png')
 
-/* ---------- 2. 切换到深色 ---------- */
-console.log('\n===== 2. 手动切换到深色 =====')
+/* ---------- 2. 切换到浅色 ---------- */
+console.log('\n===== 2. 手动切换到浅色 =====')
 await ev(`document.querySelector('.icon-btn').click(); return 1`)
 await sleep(900)
 check(
-  '切换后 data-theme = dark',
-  (await ev(`return document.documentElement.dataset.theme`)) === 'dark',
+  '切换后 data-theme = light',
+  (await ev(`return document.documentElement.dataset.theme`)) === 'light',
 )
 check(
-  'theme-color 同步为深色 #070b16',
+  'theme-color 同步为浅色 #eef2f9',
   (await ev(
     `return document.querySelector('meta[name="theme-color"]')?.getAttribute('content')`,
-  )) === '#070b16',
+  )) === '#eef2f9',
 )
 check(
   '记忆写入 localStorage',
   (await ev(`try { return localStorage.getItem('ec-theme') } catch (e) { return 'ERR' }`)) ===
-    'dark',
+    'light',
 )
 shot = await send('Page.captureScreenshot', { format: 'png' })
-fs.writeFileSync('.screenshots/15-manual-dark-grid.png', Buffer.from(shot.result.data, 'base64'))
-console.log('  📷 已保存 .screenshots/15-manual-dark-grid.png')
+fs.writeFileSync('.screenshots/15-manual-light-grid.png', Buffer.from(shot.result.data, 'base64'))
+console.log('  📷 已保存 .screenshots/15-manual-light-grid.png')
 
 /* ---------- 3. 刷新保留记忆 ---------- */
 console.log('\n===== 3. 刷新后保留记忆 =====')
 await send('Page.navigate', { url: APP_URL })
 await sleep(2600)
 check(
-  '刷新后仍为深色（记忆生效）',
-  (await ev(`return document.documentElement.dataset.theme`)) === 'dark',
+  '刷新后仍为浅色（记忆生效）',
+  (await ev(`return document.documentElement.dataset.theme`)) === 'light',
 )
 
-/* ---------- 4. 清除记忆回到浅色 ---------- */
-console.log('\n===== 4. 清除记忆后回到浅色 =====')
+/* ---------- 4. 清除记忆回到暗色 ---------- */
+console.log('\n===== 4. 清除记忆后回到暗色 =====')
 await ev(`try { localStorage.removeItem('ec-theme') } catch (e) {}`)
 await send('Page.navigate', { url: APP_URL })
 await sleep(2600)
 check(
-  '清除记忆后回到浅色',
-  (await ev(`return document.documentElement.dataset.theme`)) === 'light',
+  '清除记忆后回到暗色',
+  (await ev(`return document.documentElement.dataset.theme`)) === 'dark',
 )
 
 /* ---------- 5. 首帧前已确定主题（无闪烁） ---------- */
 console.log('\n===== 5. 首帧前主题已确定 =====')
 const htmlSnippet = await fetch(APP_URL).then((r) => r.text())
 check(
-  'index.html 静态默认 data-theme="light"',
-  /<html[^>]*data-theme="light"/.test(htmlSnippet),
+  'index.html 静态默认 data-theme="dark"',
+  /<html[^>]*data-theme="dark"/.test(htmlSnippet),
 )
 check(
   'index.html 含首帧前内联主题脚本',

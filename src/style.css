@@ -118,7 +118,11 @@ p {
 
 /* 异步 3D 组件的加载占位（由 h() 创建，无法使用 scoped 样式） */
 .atom-loading {
+  /* 与 AtomModel3D 的 .stage-wrap 保持同一套尺寸规则：
+     宽度铺满 + 1:1 + 46vh 上限。两者高度恒等，chunk 到达替换时不会顶动下方内容。 */
+  width: 100%;
   aspect-ratio: 1 / 1;
+  max-height: 46vh;
   display: flex;
   align-items: center;
   justify-content: center;

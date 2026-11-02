@@ -12,7 +12,8 @@
     "perf": "node scripts/perf3d.mjs",
     "verify": "node scripts/verify3d.mjs",
     "verify:deploy": "node scripts/verify-deploy.mjs",
-    "verify:theme": "node scripts/verify-theme.mjs"
+    "verify:theme": "node scripts/verify-theme.mjs",
+    "verify:layout": "node scripts/verify-detail-layout.mjs"
   },
   "dependencies": {
     "three": "^0.187.0",

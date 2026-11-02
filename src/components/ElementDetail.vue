@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, defineAsyncComponent, h, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, defineAsyncComponent, h, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { useScrollLock } from '../composables/useScrollLock'
 
 /** three.js 体积较大，3D 模型按需异步加载，避免拖慢首屏 */
 const AtomModel3D = defineAsyncComponent({
@@ -11,8 +12,11 @@ const AtomModel3D = defineAsyncComponent({
         '正在加载 3D 模型…',
       ]),
   },
-  delay: 100,
+  // 占位块与真实舞台同宽同高（见 .atom-loading），因此可以立即渲染：
+  // 提前 0ms 占位 → chunk 到达前后面板内容高度不变，下方信息区不会被顶动
+  delay: 0,
 })
+
 import {
   CATEGORY_MAP,
   ELEMENT_BY_NUMBER,
@@ -113,19 +117,38 @@ watch(
 
 const open = computed(() => !!props.element)
 
+/** 锁滚动时补上滚动条宽度，避免打开面板的瞬间整页宽度变化导致重排 */
+useScrollLock(open)
+
 watch(open, (v) => {
-  if (v) {
-    document.addEventListener('keydown', onKey)
-    document.body.style.overflow = 'hidden'
-  } else {
-    document.removeEventListener('keydown', onKey)
-    document.body.style.overflow = ''
-  }
+  if (v) document.addEventListener('keydown', onKey)
+  else document.removeEventListener('keydown', onKey)
 })
 
 onBeforeUnmount(() => {
   document.removeEventListener('keydown', onKey)
-  document.body.style.overflow = ''
+})
+
+/**
+ * 空闲时预取 3D chunk。
+ *
+ * 如果点开详情时 chunk 还在路上，异步组件会先渲染占位、再替换成真实组件，
+ * 替换那一下会把下面的「基本信息」等区块顶下约一个工具栏的高度。
+ * 预取后模块已在内存里，替换发生在面板入场动画的第一帧 —— 那会儿面板还在屏外，
+ * 用户看不到任何跳动，同时也不会拖慢首屏（只在浏览器空闲时下载）。
+ */
+function prefetchAtom() {
+  import('./AtomModel3D.vue').catch(() => {
+    /* 预取失败不影响正常按需加载 */
+  })
+}
+
+onMounted(() => {
+  if (typeof requestIdleCallback === 'function') {
+    requestIdleCallback(prefetchAtom, { timeout: 3000 })
+  } else {
+    setTimeout(prefetchAtom, 1500)
+  }
 })
 </script>
 
